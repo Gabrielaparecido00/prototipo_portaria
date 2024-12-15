@@ -51,7 +51,7 @@
         function cadastrarEncomenda() {
             const destinatario = document.getElementById('destinatario').value;
             if (destinatario && fotoData) {
-                fetch(`https://script.google.com/macros/s/YOUR_SCRIPT_URL/exec?action=add&destinatario=${destinatario}&foto=${encodeURIComponent(fotoData)}`, {
+                fetch(`https://script.google.com/macros/s/AKfycbw2BcQWdRpsp00gZeITCgIKIzcDqkJABEYWegQL266b7qiC0fbM-iRRqskPE1Wc0y9hFQ/exec?action=add&destinatario=${destinatario}&foto=${encodeURIComponent(fotoData)}`, {
                     method: 'GET'
                 })
                 .then(response => response.text())
