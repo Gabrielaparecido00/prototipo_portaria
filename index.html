@@ -3,45 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portaria de Condomínio - Protótipo</title>
+    <title>Sistema de Portaria - Home</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>Sistema de Portaria</h1>
-        <button id="btn-cadastrar" onclick="mostrarSeção('cadastrar')">Registrar Encomenda</button>
-        <button id="btn-retirada" onclick="mostrarSeção('retirada')">Registrar Retirada</button>
-
-        <div id="encomenda-section" style="display:none;">
-            <h2>Cadastrar Encomenda</h2>
-            <video id="camera" autoplay></video>
-            <button onclick="tirarFoto()">Tirar Foto</button>
-            <canvas id="foto-canvas" style="display:none;"></canvas>
-            <select id="destinatario">
-                <option value="C12">Bloco C, Apartamento 12</option>
-                <option value="D34">Bloco D, Apartamento 34</option>
-                <option value="E56">Bloco E, Apartamento 56</option>
-            </select>
-            <button onclick="cadastrarEncomenda()">Cadastrar</button>
-        </div>
-
-        <div id="retirada-section" style="display:none;">
-            <h2>Registrar Retirada</h2>
-            <select id="destinatario-retirada" onchange="atualizarEncomendas()">
-                <option value="C12">Bloco C, Apartamento 12</option>
-                <option value="D34">Bloco D, Apartamento 34</option>
-                <option value="E56">Bloco E, Apartamento 56</option>
-            </select>
-            <select id="encomendas-pendentes">
-                <!-- As encomendas pendentes serão preenchidas por script -->
-            </select>
-            <input type="text" id="quem-retirou" placeholder="Quem Retirou">
-            <button onclick="darBaixa()">Dar Baixa</button>
-        </div>
-
-        <div id="mensagens"></div>
+        <h1>Bem-vindo à Portaria</h1>
+        <button onclick="window.location.href='register.html'">Registrar Encomenda</button>
+        <button onclick="window.location.href='retrieve.html'">Registrar Retirada</button>
+        <button disabled style="background-color: #ccc;">Histórico (Em Breve)</button>
     </div>
-
-    <script src="script.js"></script>
 </body>
 </html>
