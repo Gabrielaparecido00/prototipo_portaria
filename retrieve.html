@@ -26,29 +26,35 @@
     <script>
         function atualizarEncomendas() {
             const destinatario = document.getElementById('destinatario-retirada').value;
-            const encomendasSelect = document.getElementById('encomendas-pendentes');
-            const encomendasPendentes = JSON.parse(localStorage.getItem('encomendasPendentes'))[destinatario];
-
-            encomendasSelect.innerHTML = '';
-            encomendasPendentes.forEach(encomenda => {
-                const option = document.createElement('option');
-                option.textContent = encomenda;
-                encomendasSelect.appendChild(option);
-            });
+            fetch('https://script.google.com/macros/s/YOUR_SCRIPT_URL/exec?action=get')
+            .then(response => response.json())
+            .then(data => {
+                const encomendasSelect = document.getElementById('encomendas-pendentes');
+                encomendasSelect.innerHTML = '';
+                data.filter(encomenda => encomenda.destinatario === destinatario).forEach(encomenda => {
+                    const option = document.createElement('option');
+                    option.textContent = encomenda.id;
+                    option.value = encomenda.id;
+                    encomendasSelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Erro:', error));
         }
 
         function darBaixa() {
-            const destinatario = document.getElementById('destinatario-retirada').value;
-            const encomendaSelecionada = document.getElementById('encomendas-pendentes').value;
+            const id = document.getElementById('encomendas-pendentes').value;
             const quemRetirou = document.getElementById('quem-retirou').value;
 
-            if (quemRetirou && encomendaSelecionada) {
-                const encomendasPendentes = JSON.parse(localStorage.getItem('encomendasPendentes'));
-                encomendasPendentes[destinatario] = encomendasPendentes[destinatario].filter(e => e !== encomendaSelecionada);
-                localStorage.setItem('encomendasPendentes', JSON.stringify(encomendasPendentes));
-
-                document.getElementById('mensagens').innerText = `Encomenda ${encomendaSelecionada} retirada por ${quemRetirou}.`;
-                atualizarEncomendas();
+            if (quemRetirou && id) {
+                fetch(`https://script.google.com/macros/s/YOUR_SCRIPT_URL/exec?action=retirar&id=${id}&quemRetirou=${quemRetirou}`, {
+                    method: 'GET'
+                })
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('mensagens').innerText = `Encomenda ${id} retirada por ${quemRetirou}.`;
+                    atualizarEncomendas();
+                })
+                .catch(error => console.error('Erro:', error));
             } else {
                 alert('Por favor, insira o nome de quem retirou e selecione uma encomenda.');
             }
