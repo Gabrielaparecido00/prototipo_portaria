@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Portaria</title>
+    <title>Sistema de Portaria com Logs</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -118,13 +118,9 @@
 
         function showSection(section) {
             console.log(`Switching to section: ${section}`);
-            document.getElementById('menu').classList.add('hidden');
-            document.getElementById('register').classList.add('hidden');
-            document.getElementById('retrieve').classList.add('hidden');
-            document.getElementById('history').classList.add('hidden');
-
+            document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
             document.getElementById(section).classList.remove('hidden');
-
+            
             if (section === 'register') iniciarCamera();
             if (section === 'retrieve') atualizarEncomendas();
             if (section === 'history') carregarHistorico();
@@ -137,7 +133,7 @@
                 navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
                     video.srcObject = stream;
                     video.play();
-                    console.log('Camera started.');
+                    console.log('Camera stream started.');
                 }).catch(err => {
                     console.error('Error accessing camera:', err);
                     alert('Não foi possível acessar a câmera.');
@@ -156,17 +152,22 @@
             canvas.width = video.videoWidth;
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
             fotoData = canvas.toDataURL('image/png');
-            console.log('Photo captured:', fotoData.slice(0, 100) + '...'); // Log truncated data URL
+            console.log('Photo captured:', fotoData.substring(0, 100) + '...'); // Log truncated data URL
         }
 
         function cadastrarEncomenda() {
             const destinatario = document.getElementById('destinatario').value;
-            console.log('Registering package for:', destinatario);
+            console.log(`Registering package for: ${destinatario}`);
             if (destinatario && fotoData) {
                 fetch(`https://script.google.com/macros/s/AKfycbw2BcQWdRpsp00gZeITCgIKIzcDqkJABEYWegQL266b7qiC0fbM-iRRqskPE1Wc0y9hFQ/exec?action=add&destinatario=${destinatario}&foto=${encodeURIComponent(fotoData)}`, {
                     method: 'GET'
                 })
-                .then(response => response.text())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.text();
+                })
                 .then(data => {
                     console.log('Response from server:', data);
                     document.getElementById('mensagens').innerText = `Encomenda cadastrada para ${destinatario}.`;
@@ -183,7 +184,7 @@
 
         function atualizarEncomendas() {
             const destinatario = document.getElementById('destinatario-retirada').value;
-            console.log('Fetching pending packages for:', destinatario);
+            console.log(`Fetching pending packages for: ${destinatario}`);
             fetch('https://script.google.com/macros/s/AKfycbw2BcQWdRpsp00gZeITCgIKIzcDqkJABEYWegQL266b7qiC0fbM-iRRqskPE1Wc0y9hFQ/exec?action=get')
             .then(response => response.json())
             .then(data => {
@@ -247,7 +248,7 @@
             });
         }
 
-        showSection('menu');
+        document.addEventListener('DOMContentLoaded', () => showSection('menu'));
     </script>
 </body>
 </html>
