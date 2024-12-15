@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Retirada</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Registrar Retirada</h2>
+        <select id="destinatario-retirada" onchange="atualizarEncomendas()">
+            <option value="C12">Bloco C, Apartamento 12</option>
+            <option value="D34">Bloco D, Apartamento 34</option>
+            <option value="E56">Bloco E, Apartamento 56</option>
+        </select>
+        <select id="encomendas-pendentes">
+            <!-- As encomendas pendentes serão preenchidas por script -->
+        </select>
+        <input type="text" id="quem-retirou" placeholder="Quem Retirou">
+        <button onclick="darBaixa()">Dar Baixa</button>
+        <div id="mensagens"></div>
+        <a href="index.html">Voltar ao Menu Inicial</a>
+    </div>
+
+    <script>
+        function atualizarEncomendas() {
+            const destinatario = document.getElementById('destinatario-retirada').value;
+            const encomendasSelect = document.getElementById('encomendas-pendentes');
+            encomendasSelect.innerHTML = '';
+            encomendasPendentes[destinatario].forEach(encomenda => {
+                const option = document.createElement('option');
+                option.textContent = encomenda;
+                encomendasSelect.appendChild(option);
+            });
+        }
+
+        function darBaixa() {
+            const destinatario = document.getElementById('destinatario-retirada').value;
+            const encomenda = document.getElementById('encomendas-pendentes').value;
+            const quemRetirou = document.getElementById('quem-retirou').value;
+            if (quemRetirou && encomenda) {
+                encomendasPendentes[destinatario] = encomendasPendentes[destinatario].filter(e => e !== encomenda);
+                document.getElementById('mensagens').innerText = `Encomenda ${encomenda} retirada por ${quemRetirou}.`;
+                atualizarEncomendas();
+            } else {
+                alert('Por favor, insira o nome de quem retirou e selecione uma encomenda.');
+            }
+        }
+    </script>
+</body>
+</html>
