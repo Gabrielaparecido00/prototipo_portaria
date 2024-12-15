@@ -3,15 +3,223 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Portaria - Home</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Sistema de Portaria</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        button {
+            width: calc(100% - 40px);
+            padding: 10px;
+            margin: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        select, input, video, canvas {
+            width: calc(100% - 40px);
+            margin: 10px 20px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        #mensagens {
+            margin-top: 20px;
+            color: #28a745;
+            font-weight: bold;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>Bem-vindo à Portaria</h1>
-        <button onclick="window.location.href='register.html'">Registrar Encomenda</button>
-        <button onclick="window.location.href='retrieve.html'">Registrar Retirada</button>
-        <button onclick="window.location.href='history.html'">Visualizar Histórico</button>
+        <h1>Sistema de Portaria</h1>
+        <div id="menu">
+            <button onclick="showSection('register')">Registrar Encomenda</button>
+            <button onclick="showSection('retrieve')">Registrar Retirada</button>
+            <button onclick="showSection('history')">Visualizar Histórico</button>
+        </div>
+
+        <div id="register" class="hidden">
+            <h2>Cadastrar Encomenda</h2>
+            <select id="destinatario">
+                <option value="C12">Bloco C, Apartamento 12</option>
+                <option value="D34">Bloco D, Apartamento 34</option>
+                <option value="E56">Bloco E, Apartamento 56</option>
+            </select>
+            <video id="camera" autoplay></video>
+            <canvas id="foto-canvas" class="hidden"></canvas>
+            <button onclick="capturarFoto()">Tirar Foto</button>
+            <button onclick="cadastrarEncomenda()">Cadastrar Encomenda</button>
+            <div id="mensagens"></div>
+            <button onclick="showSection('menu')">Voltar ao Menu</button>
+        </div>
+
+        <div id="retrieve" class="hidden">
+            <h2>Registrar Retirada</h2>
+            <select id="destinatario-retirada" onchange="atualizarEncomendas()">
+                <option value="C12">Bloco C, Apartamento 12</option>
+                <option value="D34">Bloco D, Apartamento 34</option>
+                <option value="E56">Bloco E, Apartamento 56</option>
+            </select>
+            <select id="encomendas-pendentes">
+                <!-- As encomendas pendentes serão preenchidas por script -->
+            </select>
+            <input type="text" id="quem-retirou" placeholder="Quem Retirou">
+            <button onclick="darBaixa()">Dar Baixa</button>
+            <div id="mensagens"></div>
+            <button onclick="showSection('menu')">Voltar ao Menu</button>
+        </div>
+
+        <div id="history" class="hidden">
+            <h2>Histórico de Encomendas</h2>
+            <table border="1" width="100%">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Destinatário</th>
+                        <th>Quem Retirou</th>
+                    </tr>
+                </thead>
+                <tbody id="historico-lista">
+                    <!-- Histórico será preenchido por script -->
+                </tbody>
+            </table>
+            <button onclick="showSection('menu')">Voltar ao Menu</button>
+        </div>
     </div>
+
+    <script>
+        let fotoData = "";
+
+        function showSection(section) {
+            document.getElementById('menu').classList.add('hidden');
+            document.getElementById('register').classList.add('hidden');
+            document.getElementById('retrieve').classList.add('hidden');
+            document.getElementById('history').classList.add('hidden');
+
+            document.getElementById(section).classList.remove('hidden');
+
+            if (section === 'register') iniciarCamera();
+            if (section === 'retrieve') atualizarEncomendas();
+            if (section === 'history') carregarHistorico();
+        }
+
+        function iniciarCamera() {
+            const video = document.getElementById('camera');
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+                    video.srcObject = stream;
+                    video.play();
+                }).catch(err => {
+                    console.error("Erro ao acessar a câmera: ", err);
+                    alert("Não foi possível acessar a câmera.");
+                });
+            }
+        }
+
+        function capturarFoto() {
+            const canvas = document.getElementById('foto-canvas');
+            const video = document.getElementById('camera');
+            const context = canvas.getContext('2d');
+            canvas.height = video.videoHeight;
+            canvas.width = video.videoWidth;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            fotoData = canvas.toDataURL('image/png');
+        }
+
+        function cadastrarEncomenda() {
+            const destinatario = document.getElementById('destinatario').value;
+            if (destinatario && fotoData) {
+                fetch(`https://script.google.com/macros/s/AKfycbw2BcQWdRpsp00gZeITCgIKIzcDqkJABEYWegQL266b7qiC0fbM-iRRqskPE1Wc0y9hFQ/exec?action=add&destinatario=${destinatario}&foto=${encodeURIComponent(fotoData)}`, {
+                    method: 'GET'
+                })
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('mensagens').innerText = `Encomenda cadastrada para ${destinatario}.`;
+                })
+                .catch(error => console.error('Erro:', error));
+            } else {
+                alert('Por favor, selecione um destinatário e tire uma foto.');
+            }
+        }
+
+        function atualizarEncomendas() {
+            const destinatario = document.getElementById('destinatario-retirada').value;
+            fetch('https://script.google.com/macros/s/AKfycbw2BcQWdRpsp00gZeITCgIKIzcDqkJABEYWegQL266b7qiC0fbM-iRRqskPE1Wc0y9hFQ/exec?action=get')
+            .then(response => response.json())
+            .then(data => {
+                const encomendasSelect = document.getElementById('encomendas-pendentes');
+                encomendasSelect.innerHTML = '';
+                data.filter(encomenda => encomenda.destinatario === destinatario).forEach(encomenda => {
+                    const option = document.createElement('option');
+                    option.textContent = encomenda.id;
+                    option.value = encomenda.id;
+                    encomendasSelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Erro:', error));
+        }
+
+        function darBaixa() {
+            const id = document.getElementById('encomendas-pendentes').value;
+            const quemRetirou = document.getElementById('quem-retirou').value;
+
+            if (quemRetirou && id) {
+                fetch(`https://script.google.com/macros/s/AKfycbw2BcQWdRpsp00gZeITCgIKIzcDqkJABEYWegQL266b7qiC0fbM-iRRqskPE1Wc0y9hFQ/exec?action=retirar&id=${id}&quemRetirou=${quemRetirou}`, {
+                    method: 'GET'
+                })
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('mensagens').innerText = `Encomenda ${id} retirada por ${quemRetirou}.`;
+                    atualizarEncomendas();
+                })
+                .catch(error => console.error('Erro:', error));
+            } else {
+                alert('Por favor, insira o nome de quem retirou e selecione uma encomenda.');
+            }
+        }
+
+        function carregarHistorico() {
+            fetch('https://script.google.com/macros/s/AKfycbw2BcQWdRpsp00gZeITCgIKIzcDqkJABEYWegQL266b7qiC0fbM-iRRqskPE1Wc0y9hFQ/exec?action=getHistory')
+            .then(response => response.json())
+            .then(data => {
+                const historicoLista = document.getElementById('historico-lista');
+                historicoLista.innerHTML = '';
+                data.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td>${item.id}</td><td>${item.destinatario}</td><td>${item.quemRetirou}</td>`;
+                    historicoLista.appendChild(row);
+                });
+            })
+            .catch(error => console.error('Erro:', error));
+        }
+
+        showSection('menu');
+    </script>
 </body>
 </html>
