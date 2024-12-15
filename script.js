@@ -19,12 +19,17 @@ function mostrarSeção(seção) {
 function iniciarCamera() {
     const video = document.getElementById('camera');
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+        const constraints = {
+            video: {
+                facingMode: { exact: "environment" } // Tenta acessar a câmera traseira
+            }
+        };
+        navigator.mediaDevices.getUserMedia(constraints).then(stream => {
             video.srcObject = stream;
             video.play();
         }).catch(err => {
             console.error("Erro ao acessar a câmera: ", err);
-            alert("Não foi possível acessar a câmera. Verifique se as permissões estão habilitadas.");
+            alert("Não foi possível acessar a câmera traseira. Verifique as permissões ou se o dispositivo suporta esta funcionalidade.");
         });
     }
 }
