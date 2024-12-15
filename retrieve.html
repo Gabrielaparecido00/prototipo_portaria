@@ -27,8 +27,10 @@
         function atualizarEncomendas() {
             const destinatario = document.getElementById('destinatario-retirada').value;
             const encomendasSelect = document.getElementById('encomendas-pendentes');
+            const encomendasPendentes = JSON.parse(localStorage.getItem('encomendasPendentes'))[destinatario];
+
             encomendasSelect.innerHTML = '';
-            encomendasPendentes[destinatario].forEach(encomenda => {
+            encomendasPendentes.forEach(encomenda => {
                 const option = document.createElement('option');
                 option.textContent = encomenda;
                 encomendasSelect.appendChild(option);
@@ -37,16 +39,22 @@
 
         function darBaixa() {
             const destinatario = document.getElementById('destinatario-retirada').value;
-            const encomenda = document.getElementById('encomendas-pendentes').value;
+            const encomendaSelecionada = document.getElementById('encomendas-pendentes').value;
             const quemRetirou = document.getElementById('quem-retirou').value;
-            if (quemRetirou && encomenda) {
-                encomendasPendentes[destinatario] = encomendasPendentes[destinatario].filter(e => e !== encomenda);
-                document.getElementById('mensagens').innerText = `Encomenda ${encomenda} retirada por ${quemRetirou}.`;
+
+            if (quemRetirou && encomendaSelecionada) {
+                const encomendasPendentes = JSON.parse(localStorage.getItem('encomendasPendentes'));
+                encomendasPendentes[destinatario] = encomendasPendentes[destinatario].filter(e => e !== encomendaSelecionada);
+                localStorage.setItem('encomendasPendentes', JSON.stringify(encomendasPendentes));
+
+                document.getElementById('mensagens').innerText = `Encomenda ${encomendaSelecionada} retirada por ${quemRetirou}.`;
                 atualizarEncomendas();
             } else {
                 alert('Por favor, insira o nome de quem retirou e selecione uma encomenda.');
             }
         }
+
+        window.onload = atualizarEncomendas;
     </script>
 </body>
 </html>
