@@ -18,9 +18,9 @@
             <button onclick="tirarFoto()">Tirar Foto</button>
             <canvas id="foto-canvas" style="display:none;"></canvas>
             <select id="destinatario">
-                <option>Bloco C, Apartamento 12</option>
-                <option>Bloco D, Apartamento 34</option>
-                <option>Bloco E, Apartamento 56</option>
+                <option value="C12">Bloco C, Apartamento 12</option>
+                <option value="D34">Bloco D, Apartamento 34</option>
+                <option value="E56">Bloco E, Apartamento 56</option>
             </select>
             <button onclick="cadastrarEncomenda()">Cadastrar</button>
         </div>
@@ -28,9 +28,9 @@
         <div id="retirada-section" style="display:none;">
             <h2>Registrar Retirada</h2>
             <select id="destinatario-retirada" onchange="atualizarEncomendas()">
-                <option>Bloco C, Apartamento 12</option>
-                <option>Bloco D, Apartamento 34</option>
-                <option>Bloco E, Apartamento 56</option>
+                <option value="C12">Bloco C, Apartamento 12</option>
+                <option value="D34">Bloco D, Apartamento 34</option>
+                <option value="E56">Bloco E, Apartamento 56</option>
             </select>
             <select id="encomendas-pendentes">
                 <!-- As encomendas pendentes serão preenchidas por script -->
