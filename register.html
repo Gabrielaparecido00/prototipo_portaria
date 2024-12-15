@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Encomenda</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Cadastrar Encomenda</h2>
+        <select id="destinatario">
+            <option value="C12">Bloco C, Apartamento 12</option>
+            <option value="D34">Bloco D, Apartamento 34</option>
+            <option value="E56">Bloco E, Apartamento 56</option>
+        </select>
+        <button onclick="cadastrarEncomenda()">Cadastrar</button>
+        <div id="mensagens"></div>
+        <a href="index.html">Voltar ao Menu Inicial</a>
+    </div>
+
+    <script>
+        let encomendasPendentes = {
+            "C12": [],
+            "D34": [],
+            "E56": []
+        };
+
+        function cadastrarEncomenda() {
+            const destinatario = document.getElementById('destinatario').value;
+            if (destinatario) {
+                const novaEncomenda = `Encomenda ${encomendasPendentes[destinatario].length + 1}`;
+                encomendasPendentes[destinatario].push(novaEncomenda);
+                document.getElementById('mensagens').innerText = `Encomenda cadastrada para ${destinatario}.`;
+            }
+        }
+    </script>
+</body>
+</html>
