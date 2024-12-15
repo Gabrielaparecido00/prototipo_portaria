@@ -117,6 +117,7 @@
         let fotoData = "";
 
         function showSection(section) {
+            console.log(`Switching to section: ${section}`);
             document.getElementById('menu').classList.add('hidden');
             document.getElementById('register').classList.add('hidden');
             document.getElementById('retrieve').classList.add('hidden');
@@ -130,19 +131,24 @@
         }
 
         function iniciarCamera() {
+            console.log('Initializing camera...');
             const video = document.getElementById('camera');
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                 navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
                     video.srcObject = stream;
                     video.play();
+                    console.log('Camera started.');
                 }).catch(err => {
-                    console.error("Erro ao acessar a câmera: ", err);
-                    alert("Não foi possível acessar a câmera.");
+                    console.error('Error accessing camera:', err);
+                    alert('Não foi possível acessar a câmera.');
                 });
+            } else {
+                console.error('getUserMedia not supported in this browser.');
             }
         }
 
         function capturarFoto() {
+            console.log('Capturing photo...');
             const canvas = document.getElementById('foto-canvas');
             const video = document.getElementById('camera');
             const context = canvas.getContext('2d');
@@ -150,29 +156,38 @@
             canvas.width = video.videoWidth;
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
             fotoData = canvas.toDataURL('image/png');
+            console.log('Photo captured:', fotoData.slice(0, 100) + '...'); // Log truncated data URL
         }
 
         function cadastrarEncomenda() {
             const destinatario = document.getElementById('destinatario').value;
+            console.log('Registering package for:', destinatario);
             if (destinatario && fotoData) {
                 fetch(`https://script.google.com/macros/s/AKfycbw2BcQWdRpsp00gZeITCgIKIzcDqkJABEYWegQL266b7qiC0fbM-iRRqskPE1Wc0y9hFQ/exec?action=add&destinatario=${destinatario}&foto=${encodeURIComponent(fotoData)}`, {
                     method: 'GET'
                 })
                 .then(response => response.text())
                 .then(data => {
+                    console.log('Response from server:', data);
                     document.getElementById('mensagens').innerText = `Encomenda cadastrada para ${destinatario}.`;
                 })
-                .catch(error => console.error('Erro:', error));
+                .catch(error => {
+                    console.error('Error registering package:', error);
+                    alert('Erro ao cadastrar a encomenda. Verifique o console para mais detalhes.');
+                });
             } else {
+                console.warn('Missing destinatario or photo data.');
                 alert('Por favor, selecione um destinatário e tire uma foto.');
             }
         }
 
         function atualizarEncomendas() {
             const destinatario = document.getElementById('destinatario-retirada').value;
+            console.log('Fetching pending packages for:', destinatario);
             fetch('https://script.google.com/macros/s/AKfycbw2BcQWdRpsp00gZeITCgIKIzcDqkJABEYWegQL266b7qiC0fbM-iRRqskPE1Wc0y9hFQ/exec?action=get')
             .then(response => response.json())
             .then(data => {
+                console.log('Pending packages data:', data);
                 const encomendasSelect = document.getElementById('encomendas-pendentes');
                 encomendasSelect.innerHTML = '';
                 data.filter(encomenda => encomenda.destinatario === destinatario).forEach(encomenda => {
@@ -182,32 +197,42 @@
                     encomendasSelect.appendChild(option);
                 });
             })
-            .catch(error => console.error('Erro:', error));
+            .catch(error => {
+                console.error('Error fetching pending packages:', error);
+                alert('Erro ao buscar encomendas pendentes. Verifique o console para mais detalhes.');
+            });
         }
 
         function darBaixa() {
             const id = document.getElementById('encomendas-pendentes').value;
             const quemRetirou = document.getElementById('quem-retirou').value;
-
+            console.log(`Marking package ${id} as retrieved by ${quemRetirou}.`);
             if (quemRetirou && id) {
                 fetch(`https://script.google.com/macros/s/AKfycbw2BcQWdRpsp00gZeITCgIKIzcDqkJABEYWegQL266b7qiC0fbM-iRRqskPE1Wc0y9hFQ/exec?action=retirar&id=${id}&quemRetirou=${quemRetirou}`, {
                     method: 'GET'
                 })
                 .then(response => response.text())
                 .then(data => {
+                    console.log('Response from server on package retrieval:', data);
                     document.getElementById('mensagens').innerText = `Encomenda ${id} retirada por ${quemRetirou}.`;
                     atualizarEncomendas();
                 })
-                .catch(error => console.error('Erro:', error));
+                .catch(error => {
+                    console.error('Error marking package as retrieved:', error);
+                    alert('Erro ao dar baixa na encomenda. Verifique o console para mais detalhes.');
+                });
             } else {
+                console.warn('Missing quemRetirou or package ID.');
                 alert('Por favor, insira o nome de quem retirou e selecione uma encomenda.');
             }
         }
 
         function carregarHistorico() {
+            console.log('Loading history...');
             fetch('https://script.google.com/macros/s/AKfycbw2BcQWdRpsp00gZeITCgIKIzcDqkJABEYWegQL266b7qiC0fbM-iRRqskPE1Wc0y9hFQ/exec?action=getHistory')
             .then(response => response.json())
             .then(data => {
+                console.log('History data:', data);
                 const historicoLista = document.getElementById('historico-lista');
                 historicoLista.innerHTML = '';
                 data.forEach(item => {
@@ -216,7 +241,10 @@
                     historicoLista.appendChild(row);
                 });
             })
-            .catch(error => console.error('Erro:', error));
+            .catch(error => {
+                console.error('Error loading history:', error);
+                alert('Erro ao carregar o histórico. Verifique o console para mais detalhes.');
+            });
         }
 
         showSection('menu');
