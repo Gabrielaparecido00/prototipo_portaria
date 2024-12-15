@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portaria de Condomínio - Protótipo</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Sistema de Portaria</h1>
+        <div id="encomenda-section">
+            <h2>Cadastrar Encomenda</h2>
+            <input type="file" id="foto-encomenda" accept="image/*">
+            <input type="text" id="destinatario" placeholder="Nome do Destinatário">
+            <button onclick="cadastrarEncomenda()">Cadastrar</button>
+        </div>
+
+        <div id="retirada-section">
+            <h2>Registrar Retirada</h2>
+            <input type="text" id="destinatario-retirada" placeholder="Nome do Destinatário">
+            <input type="text" id="quem-retirou" placeholder="Quem Retirou">
+            <button onclick="darBaixa()">Dar Baixa</button>
+        </div>
+
+        <div id="mensagens"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
