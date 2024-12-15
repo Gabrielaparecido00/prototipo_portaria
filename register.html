@@ -9,36 +9,62 @@
 <body>
     <div class="container">
         <h2>Cadastrar Encomenda</h2>
-        <p>Simulação de foto com a câmera (o suporte varia por navegador).</p>
-        <canvas id="foto-canvas" style="display:none;"></canvas>
         <select id="destinatario">
             <option value="C12">Bloco C, Apartamento 12</option>
             <option value="D34">Bloco D, Apartamento 34</option>
             <option value="E56">Bloco E, Apartamento 56</option>
         </select>
+        <video id="camera" autoplay></video>
+        <canvas id="foto-canvas" style="display:none;"></canvas>
+        <button onclick="capturarFoto()">Tirar Foto</button>
         <button onclick="cadastrarEncomenda()">Cadastrar Encomenda</button>
         <div id="mensagens"></div>
         <a href="index.html">Voltar ao Menu Inicial</a>
     </div>
 
     <script>
-        if (!localStorage.getItem('encomendasPendentes')) {
-            localStorage.setItem('encomendasPendentes', JSON.stringify({
-                "C12": [],
-                "D34": [],
-                "E56": []
-            }));
+        let fotoData = "";
+
+        function iniciarCamera() {
+            const video = document.getElementById('camera');
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+                    video.srcObject = stream;
+                    video.play();
+                }).catch(err => {
+                    console.error("Erro ao acessar a câmera: ", err);
+                    alert("Não foi possível acessar a câmera.");
+                });
+            }
+        }
+
+        function capturarFoto() {
+            const canvas = document.getElementById('foto-canvas');
+            const video = document.getElementById('camera');
+            const context = canvas.getContext('2d');
+            canvas.height = video.videoHeight;
+            canvas.width = video.videoWidth;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            fotoData = canvas.toDataURL('image/png');
         }
 
         function cadastrarEncomenda() {
             const destinatario = document.getElementById('destinatario').value;
-            const encomendasPendentes = JSON.parse(localStorage.getItem('encomendasPendentes'));
-            const novaEncomenda = `Encomenda ${encomendasPendentes[destinatario].length + 1}`;
-
-            encomendasPendentes[destinatario].push(novaEncomenda);
-            localStorage.setItem('encomendasPendentes', JSON.stringify(encomendasPendentes));
-            document.getElementById('mensagens').innerText = `Encomenda cadastrada para ${destinatario}.`;
+            if (destinatario && fotoData) {
+                fetch(`https://script.google.com/macros/s/YOUR_SCRIPT_URL/exec?action=add&destinatario=${destinatario}&foto=${encodeURIComponent(fotoData)}`, {
+                    method: 'GET'
+                })
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('mensagens').innerText = `Encomenda cadastrada para ${destinatario}.`;
+                })
+                .catch(error => console.error('Erro:', error));
+            } else {
+                alert('Por favor, selecione um destinatário e tire uma foto.');
+            }
         }
+
+        window.onload = iniciarCamera;
     </script>
 </body>
 </html>
