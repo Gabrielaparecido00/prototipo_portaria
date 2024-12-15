@@ -10,7 +10,7 @@ function mostrarSeção(seção) {
     if (seção === 'cadastrar') {
         document.getElementById('encomenda-section').style.display = 'block';
         iniciarCamera();
-    } else {
+    } else if (seção === 'retirada') {
         document.getElementById('retirada-section').style.display = 'block';
         atualizarEncomendas();
     }
@@ -22,6 +22,9 @@ function iniciarCamera() {
         navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
             video.srcObject = stream;
             video.play();
+        }).catch(err => {
+            console.error("Erro ao acessar a câmera: ", err);
+            alert("Não foi possível acessar a câmera. Verifique se as permissões estão habilitadas.");
         });
     }
 }
